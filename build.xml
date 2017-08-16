@@ -22,6 +22,7 @@
   </target>
 
   <target name="run" depends="jar">
+    <echo>Running.</echo>
     <java jar="${jar.dir}/${ant.project.name}.jar" fork="true"/>
   </target>
 

@@ -1,8 +1,8 @@
 A program that creates a color grid.
 
 Functionality, in order of implementation:  
-- *Image Creation*
-  1. Create completely blue image of 50x50 pixels
++ *Image Creation*
+  1. Create completely blue image of 50x50 pixels *done*
 - *Bit Palette Creation*
   1. Create a rgb111 image strip, with each segment being 50x50 pixels
   2. Create a rgb111 image grid, with each cell being 50x50 pixels
