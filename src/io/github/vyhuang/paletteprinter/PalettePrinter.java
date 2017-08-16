@@ -1,3 +1,4 @@
+package paletteprinter;
 /**
 **/
 public class PalettePrinter {
