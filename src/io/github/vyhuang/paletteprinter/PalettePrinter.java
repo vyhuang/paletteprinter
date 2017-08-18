@@ -33,7 +33,6 @@ public class PalettePrinter {
     int cellWidth, cellHeight;
 
     BitPalette bitPal = new BitPalette(new int[]{50,50}, new char[]{1,1,1});
-    //System.out.println(bitPal.internalPalette.
 
     /* Test code begin */
 
@@ -43,6 +42,17 @@ public class PalettePrinter {
     g2d.fill(new Rectangle.Float(10,10,25,25));
     g2d.dispose();
     */
+
+    Color temp;
+
+    for (int i = 0; i < 2; i += 1) {
+      for (int j = 0; j < 4; j += 1) {
+        System.out.println(i + ":" + j);
+        temp = bitPal.getColor(i,j);
+        System.out.println(temp.getRed() + "," + temp.getGreen() + "," + temp.getBlue());
+      }
+    }
+
 
     /* end Test code */
 

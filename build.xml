@@ -9,7 +9,7 @@
 
   <target name="palette_compile">
     <mkdir dir="${classes.dir}"/>
-    <javac srcdir="${src.dir}/io/github/vyhuang/paletteprinter" destdir="${classes.dir}"/>
+    <javac srcdir="${src.dir}" destdir="${classes.dir}"/>
   </target>
 
   <target name="jar" depends="compile">
