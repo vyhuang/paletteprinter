@@ -1,4 +1,4 @@
-package paletteprinter;
+package io.github.vyhuang.paletteprinter;
 
 import java.io.*;
 import javax.imageio.*;
@@ -32,21 +32,28 @@ public class PalettePrinter {
     BufferedImage image;
     int cellWidth, cellHeight;
 
+    BitPalette bitPal = new BitPalette(new int[]{50,50}, new char[]{1,1,1});
+    //System.out.println(bitPal.internalPalette.
+
     /* Test code begin */
 
+    /*
     Graphics2D g2d = image.createGraphics();
     g2d.setColor(Color.red);
     g2d.fill(new Rectangle.Float(10,10,25,25));
     g2d.dispose();
+    */
 
     /* end Test code */
 
+    /*
     try {
       outputfile = new File("image_grid.png");
       ImageIO.write(image, "png", outputfile);
     } catch (IOException e) {
       System.out.println("Image failed to be saved.");
     }
+    */
 
     return;
   }
