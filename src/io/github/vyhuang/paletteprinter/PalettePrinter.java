@@ -32,7 +32,9 @@ public class PalettePrinter {
     BufferedImage image;
     int cellWidth, cellHeight;
 
-    BitPalette bitPal = new BitPalette(new int[]{50,50}, new char[]{1,1,1});
+    BitPalette bitPal = new BitPalette(new int[]{1,1,1});
+    System.out.printf("new palette created with rgb%d%d%d values \n",
+        bitPal.redBits(), bitPal.blueBits(), bitPal.greenBits());
 
     /* Test code begin */
 
@@ -45,6 +47,9 @@ public class PalettePrinter {
 
     Color temp;
 
+    System.out.printf("rgb levels in created palette: %d:%d:%d\n",
+        bitPal.redLevels(),bitPal.greenLevels(),bitPal.blueLevels());
+
     for (int i = 0; i < 2; i += 1) {
       for (int j = 0; j < 4; j += 1) {
         System.out.println(i + ":" + j);
@@ -52,6 +57,9 @@ public class PalettePrinter {
         System.out.println(temp.getRed() + "," + temp.getGreen() + "," + temp.getBlue());
       }
     }
+
+    System.out.println("Creating erroneous palette...");
+    BitPalette errPal = new BitPalette(new int[]{-1,0,10});
 
 
     /* end Test code */
@@ -67,5 +75,19 @@ public class PalettePrinter {
 
     return;
   }
+
+  private void drawGrid() {
+    /*
+    for (int i = 0; i < cellDim.length; i+= 1) {
+      if (cellDim[i] <= 0) {
+        System.err.printf("%d is an invalid dimensional value. Changing to 1.",cellDim[i]);
+        cellDim[i] = 1;
+      }
+    }
+    cellWidth   = cellDim[0];
+    cellHeight  = cellDim[1];
+     */
+  }
+
 
 }
