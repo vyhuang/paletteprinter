@@ -60,7 +60,7 @@ public class PalettePrinter {
         currentColor = bitPalette.getColor(i,j);
         g2d.setColor(currentColor);
         cell.setRect(j*cell.getWidth(), i*cell.getHeight(), cell.getWidth(), cell.getHeight());
-        System.out.printf("x,y = %d,%d\n",(int)cell.getX(),(int)cell.getY());
+        //System.out.printf("x,y = %d,%d\n",(int)cell.getX(),(int)cell.getY());
         g2d.fill(cell);
       }
     }
@@ -69,7 +69,7 @@ public class PalettePrinter {
   public static void main(String[] args) {
     File inputfile, outputfile;
 
-    BitPalette bitPal = new BitPalette(new int[]{1,1,1});
+    BitPalette bitPal = new BitPalette(new int[]{2,2,2});
     System.out.printf("new palette created with rgb%d%d%d values \n",
         bitPal.redBits(), bitPal.blueBits(), bitPal.greenBits());
     System.out.printf("%d rows, %d columns\n",bitPal.paletteRows(),bitPal.paletteCols());
