@@ -110,9 +110,9 @@ public class BitPalette {
     return paletteCols;
   }
   public int paletteRows() {
-    return paletteRows();
+    return paletteRows;
   }
-  public Color getColor(int x, int y) {
-    return internalPalette[x][y];
+  public Color getColor(int row, int column) {
+    return internalPalette[row][column];
   }
 }
