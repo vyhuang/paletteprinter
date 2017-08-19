@@ -31,10 +31,10 @@ public class PalettePrinter {
   BufferedImage image;
   int imageWidth, imageHeight;
   int cellWidth, cellHeight;
-  BitPalette bitPalette;
 
+  Color[][] orderedPalette;
 
-  public PalettePrinter(int[] cellDim, BitPalette bitPal) {
+  public PalettePrinter(int[] cellDim) {
     for (int i = 0; i < cellDim.length; i+= 1) {
       if (cellDim[i] <= 0) {
         System.err.printf("%d is an invalid dimensional value. Changing to 1.",cellDim[i]);
@@ -44,14 +44,24 @@ public class PalettePrinter {
     cellWidth   = cellDim[0];
     cellHeight  = cellDim[1];
 
-    imageWidth = cellWidth * bitPal.paletteCols();
-    imageHeight = cellHeight * bitPal.paletteRows();
-
-    image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
-    bitPalette = bitPal;
+  }
+  public PalettePrinter(int[] cellDim, BitPalette bitPal) {
+    for (int i = 0; i < cellDim.length; i+= 1) {
+      if (cellDim[i] <= 0) {
+        System.err.printf("%d is an invalid dimensional value. Changing to 1.",cellDim[i]);
+        cellDim[i] = 1;
+      }
+    }
+    cellWidth   = cellDim[0];
+    cellHeight  = cellDim[1];
   }
 
-  private void drawGrid() {
+  private void drawGrid(BitPalette bitPalette) {
+    imageWidth = cellWidth * bitPalette.paletteCols();
+    imageHeight = cellHeight * bitPalette.paletteRows();
+
+    image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
+
     Graphics2D g2d = image.createGraphics();
     Rectangle.Float cell = new Rectangle.Float(0,0,cellWidth,cellHeight);
     Color currentColor;
@@ -65,32 +75,114 @@ public class PalettePrinter {
       }
     }
   }
+  private void drawGrid() {
+  }
 
-  public static void main(String[] args) {
-    File inputfile, outputfile;
-
-    BitPalette bitPal = new BitPalette(new int[]{2,2,2});
-    System.out.printf("new palette created with rgb%d%d%d values \n",
-        bitPal.redBits(), bitPal.blueBits(), bitPal.greenBits());
-    System.out.printf("%d rows, %d columns\n",bitPal.paletteRows(),bitPal.paletteCols());
-
-    PalettePrinter palPrinter = new PalettePrinter(new int[]{50,50}, bitPal);
-
-    /* Test code begin */
-    palPrinter.drawGrid();
-    
-    /* end Test code */
-
-    
+  public void writePng(String outputFilename) {
+    File outputFile;
     try {
-      outputfile = new File("image_grid.png");
-      ImageIO.write(palPrinter.image, "png", outputfile);
+      outputFile = new File(outputFilename);
+      ImageIO.write(image, "png", outputFile);
     } catch (IOException e) {
       System.out.println("Image failed to be saved.");
     }
-    
-
-    return;
+  }
+  public void writePng() {
+    try {
+      File outputFile = new File("default.png");
+      ImageIO.write(image, "png", outputFile);
+    } catch (IOException e) {
+      System.out.println("Image failed to be saved.");
+    }
+  }
+ 
+  private static void badArgsMessage() {
+      System.out.println(
+          "java -jar paletteprinter.jar [input.gpl] ?[HSB/CIELCH] \n \t OR \n" +
+          "java -jar paletteprinter.jar [R] [G] [B] ?([-f/-i] [output.gpl/output.png])"
+          );
   }
 
+
+  public static void main(String[] args) {
+ 
+    boolean createPng = true;
+    boolean defaultOutput = true;
+    int[] cellDimensions;
+    
+    String inputFileName;
+
+    BitPalette bitPal;
+    PalettePrinter palPrinter;
+    int[] colors;
+
+    //remove later
+    cellDimensions = new int[]{50,50};
+
+    switch (args.length) {
+      // test code runs here
+      case 0:   break;
+
+      // Resulting grid has input.gpl-specified number of columns
+      case 1:   inputFileName = args[0];
+                break;
+
+      // HSB/CIELCH ordering
+      case 2:   if (args[1] != "HSB" || args[1] != "CIELCH") {
+                  badArgsMessage();
+                  return;
+                }
+                inputFileName = args[0];
+                palPrinter = new PalettePrinter(cellDimensions);
+                // call paletteOrder()
+                break;
+
+      // default bit palette print
+      case 3:   colors = new int[]{
+                  Integer.parseInt(args[0]), 
+                  Integer.parseInt(args[1]), 
+                  Integer.parseInt(args[2])
+                };
+                bitPal = new BitPalette(colors);
+                palPrinter = new PalettePrinter(cellDimensions,bitPal);
+                break;
+
+      // specified bit palette creation/print
+      case 5:   colors = new int[] {
+                  Integer.parseInt(args[0]), 
+                  Integer.parseInt(args[1]), 
+                  Integer.parseInt(args[2])
+                };
+                bitPal = new BitPalette(colors);
+                palPrinter = new PalettePrinter(cellDimensions,bitPal);
+                if (args[3] == "-f") {
+                  createPng = false;
+                  defaultOutput = false;
+                } else if (args[3] == "-i") {
+                  defaultOutput = false; 
+                } else {
+                  badArgsMessage();
+                  return;
+                }
+                break;
+
+      default:  badArgsMessage();
+                return;
+    }
+
+
+    BitPalette testbitPal = new BitPalette(new int[]{2,2,2});
+    System.out.printf("new palette created with rgb%d%d%d values \n",
+        testbitPal.redBits(), testbitPal.blueBits(), testbitPal.greenBits());
+    System.out.printf("%d rows, %d columns\n",testbitPal.paletteRows(),testbitPal.paletteCols());
+
+    palPrinter = new PalettePrinter(new int[]{50,50}, testbitPal);
+
+    /* Test code begin */
+    palPrinter.drawGrid(testbitPal);
+    
+    palPrinter.writePng();
+    /* end Test code */
+    return;
+  }
 }
