@@ -9,17 +9,18 @@ public class BitPalette {
   private Color[][] internalPalette;
   private int paletteRows, paletteCols;
 
+  BitPalette() {}
   BitPalette(int[] rgbBits) {
 
     bitCheck(rgbBits);
 
     redBits     = (char) rgbBits[0];
-    blueBits    = (char) rgbBits[1];
-    greenBits   = (char) rgbBits[2];
+    greenBits   = (char) rgbBits[1];
+    blueBits    = (char) rgbBits[2];
 
     redLevels   = (int) Math.pow(2,redBits);
-    blueLevels  = (int) Math.pow(2,blueBits);
     greenLevels = (int) Math.pow(2,greenBits);
+    blueLevels  = (int) Math.pow(2,blueBits);
 
     // (2^redBits)(2^blueBits) columns; (2^greenBits) rows
     paletteRows = greenLevels;

@@ -12,6 +12,11 @@
     <javac srcdir="${src.dir}" destdir="${classes.dir}"/>
   </target>
 
+  <target name="debug_compile" depends="clean">
+    <mkdir dir="${classes.dir}"/>
+    <javac srcdir="${src.dir}" destdir="${classes.dir}" debug="on"/>
+  </target>
+
   <target name="jar" depends="compile">
     <mkdir dir="${jar.dir}"/>
     <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
@@ -28,8 +33,8 @@
 
   <target name="clean-build" depends="clean,jar"/>
 
-  <target name="main" depends="clean,run"/>
-
   <target name="compile" depends="palette_compile"/>
+
+  <target name="main" depends="clean,run"/>
 
 </project>

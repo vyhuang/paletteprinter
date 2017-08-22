@@ -10,7 +10,7 @@ Can take input in the two following forms:
   - if "HSB", a color's row is determined by its hue, and its column by its brightness
   - if "CIELCH", a color's row is determined by its hue, and it's column by its lightness. 
 
-`java -jar paletteprinter [R] [G] [B] ?[-f/-i] ?[input.gpl/output.png]`  
+`java -jar paletteprinter [R] [G] [B] ?[-gpl/-png] ?[input.gpl/output.png]`  
 * R,G,B are the number of bits available for the red, green, and blue channels respectively.
 * The second parameter is optional. If this is absent, create the file "output.png" containing
  an image grid where R increases alongside the y-axis, G increases alongside the x-axis, and B
@@ -26,8 +26,8 @@ Can take input in the two following forms:
   2. Create a rgb111 image grid, with each cell being 50x50 pixels. *done*
   3. Create a rgb222 image grid, with each cell being 50x50 pixels. *done*
 - *User Input Handling*
-  1. Create a rgb222 image grid with a user-defined filename.
-  2. Create a image grid with user-allocated rgb bits, with each cell being 50x50 pixels.
+  1. Create a rgb222 image grid with a user-defined filename. *done*
+  2. Create a image grid with user-allocated rgb bits, with each cell being 50x50 pixels. *done*
 - *Bit Palette Creation*
   1. Create a .gpl file with every color possible with the user-defined rgb bits, with the number of
   columns being equal to the unique values of the red channel.
