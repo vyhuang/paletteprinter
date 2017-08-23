@@ -2,14 +2,35 @@ package io.github.vyhuang.paletteprinter;
 
 import java.awt.Color;
 
+/**
+ * This class represents the RGB palette corresponding to the given intensities of red, blue, and
+ * green allowed by the number of bits allocated to each color channel.
+ *
+ * <p>A BitPalette instance must be given parameters when initialized, is immutable, and contains:
+ * <ul>
+ * <li>redBits, blueBits, greenBits: the number of bits available in each color channel (max 8).
+ * <li>redLevels, greenLevels, blueLevels: the number of unique intensity levels for each color.
+ * <li>internalPalette: two-dimensional array spanning all combinations of color intensities.
+ * <li>paletteRows, paletteCols: dimensions of the internalPalette of this BitPalette.
+ * </ul>
+ * </p>
+ */
 public class BitPalette {
   private char redBits, blueBits, greenBits;
   private int redLevels, greenLevels, blueLevels;
-  // top left corner has coordinates <0,0>
   private Color[][] internalPalette;
   private int paletteRows, paletteCols;
 
-  BitPalette() {}
+  /**
+   * Empty constructor; should only be called within this package.
+   */
+  protected BitPalette() {}
+  /**
+   * Parameterized constructor, initializes this instance to hold the RGB palette corresponding to
+   * the input array rgbBits.
+   *
+   * @param rgbBits   contains number of bits assigned to red, green, blue color channels (in order)
+   */
   BitPalette(int[] rgbBits) {
 
     bitCheck(rgbBits);
@@ -22,7 +43,7 @@ public class BitPalette {
     greenLevels = (int) Math.pow(2,greenBits);
     blueLevels  = (int) Math.pow(2,blueBits);
 
-    // (2^redBits)(2^blueBits) columns; (2^greenBits) rows
+    /** There are |redLevels|*|blueLevels| columns, and |greenLevels| rows */
     paletteRows = greenLevels;
     paletteCols = redLevels * blueLevels;
 
@@ -88,32 +109,65 @@ public class BitPalette {
     return 255/(numLevels-1);
   }
 
-  // Access methods
+  /**
+   * Returns number of bits allocated for the red color channel.
+   */
   public int redBits() {
     return redBits;
   }
+  /**
+   * Returns number of bits allocated for the green color channel.
+   */
   public int greenBits() {
     return greenBits;
   }
+  /**
+   * Returns number of bits allocated for the blue color channel.
+   */
   public int blueBits() {
     return blueBits;
   }
+  /**
+   * Returns number of unique levels possible for the red color channel.
+   */
   public int redLevels() {
     return redLevels;
   }
+  /**
+   * Returns number of unique levels possible for the green color channel.
+   */
   public int greenLevels() {
     return greenLevels;
   }
+  /**
+   * Returns number of unique levels possible for the blue color channel.
+   */
   public int blueLevels() {
     return blueLevels;
   }
+  /**
+   * Returns number of columns in palette (length of a row).
+   */
   public int paletteCols() {
     return paletteCols;
   }
+  /**
+   * Returns number of rows in a palette (height of a column).
+   */
   public int paletteRows() {
     return paletteRows;
   }
+  /**
+   * Retrieves the java.awt.Color object at the specified location in the palette.
+   *
+   * @param row     the row the desired Color is in
+   * @param column  the column the desired Color is in
+   */
   public Color getColor(int row, int column) {
+    if (row >= paletteRows || column >= paletteCols) {
+      System.err.println("getColor() request out of bounds.");
+      return null;
+    }
     return internalPalette[row][column];
   }
 }
