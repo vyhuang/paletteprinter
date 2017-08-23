@@ -34,20 +34,112 @@ public class PalettePrinter {
 
   Color[][] orderedPalette;
 
+  public static void main(String[] args) {
+
+    // Indicates that output filename will be default.png
+    final int MODE_RGB_PNG_DEFAULT  = 0;
+    final int MODE_GPL_HSB_DEFAULT  = 1;
+    final int MODE_GPL_CIE_DEFAULT  = 2;
+    // Indicates that custom filenames have been provided
+    final int MODE_RGB_PNG_CUSTOM   = 3;
+    final int MODE_GPL_HSB_CUSTOM   = 4;
+    final int MODE_GPL_CIE_CUSTOM   = 5;
+    // Indicates that .gpl file will be created instead of a .png file
+    final int MODE_RGB_GPL_DEFAULT  = 6;
+    final int MODE_RGB_GPL_CUSTOM   = 7;
+
+    BitPalette bitPal = new BitPalette();
+    PalettePrinter palPrinter = new PalettePrinter();
+    String inputFileName;
+
+    int[] colors = new int[0];
+    int[] cellDimensions;
+ 
+    if (args.length == 3 || args.length == 5) {
+      colors = new int[]{
+        Integer.parseInt(args[0]), 
+        Integer.parseInt(args[1]), 
+        Integer.parseInt(args[2])
+      };
+    }
+
+    int mode = -1;
+
+    switch (args.length) {
+      //test code in main runs here
+      //case 0:   break;
+
+      // Resulting grid has input.gpl-specified number of columns
+      case 1:   inputFileName = args[0];
+                break;
+
+      // HSB/CIELCH ordering
+      case 2:   if (args[1].equals("HSB")) {
+                  mode = MODE_GPL_HSB_DEFAULT;
+                } else if (args[1].equals( "CIELCH")) {
+                  mode = MODE_GPL_CIE_DEFAULT;
+                } else {
+                  badArgsMessage();
+                  return;
+                }
+                inputFileName = args[0];
+                // call paletteOrder()
+                break;
+
+      // default bit palette print
+      case 3:   mode = MODE_RGB_PNG_DEFAULT;
+                bitPal = new BitPalette(colors);
+                break;
+
+      // specified bit palette creation/print
+      case 5:   if (args[3].equals("-gpl")) {
+                  mode = MODE_RGB_GPL_CUSTOM;
+                } else if (args[3].equals("-png")) {
+                  mode = MODE_RGB_PNG_CUSTOM;
+                } else {
+                  badArgsMessage();
+                  return;
+                }
+ 
+                System.out.printf("%s %s %s %s %s\n",args[0],args[1],args[2],args[3],args[4]);
+                bitPal = new BitPalette(colors);
+               break;
+
+      default:  badArgsMessage();
+                return;
+    }
+
+    switch (mode) {
+      case MODE_RGB_PNG_DEFAULT:
+                palPrinter.drawGrid(bitPal);
+                palPrinter.writePng();
+                break;
+      case MODE_RGB_PNG_CUSTOM:
+                palPrinter.drawGrid(bitPal);
+                palPrinter.writePng(args[4]);
+                break;
+      case MODE_GPL_HSB_DEFAULT:
+                break;
+      case MODE_GPL_HSB_CUSTOM:
+                break;
+      case MODE_GPL_CIE_DEFAULT:
+                break;
+      case MODE_GPL_CIE_CUSTOM:
+                break;
+      case MODE_RGB_GPL_DEFAULT:
+                break;
+      case MODE_RGB_GPL_CUSTOM:
+                break;
+      default:  
+                return;
+    }
+    return;
+  }
+
   public PalettePrinter() {
     cellWidth = cellHeight = 50;
   }
   public PalettePrinter(int[] cellDim) {
-    for (int i = 0; i < cellDim.length; i+= 1) {
-      if (cellDim[i] <= 0) {
-        System.err.printf("%d is an invalid dimensional value. Changing to 1.",cellDim[i]);
-        cellDim[i] = 1;
-      }
-    }
-    cellWidth   = cellDim[0];
-    cellHeight  = cellDim[1];
-  }
-  public PalettePrinter(int[] cellDim, BitPalette bitPal) {
     for (int i = 0; i < cellDim.length; i+= 1) {
       if (cellDim[i] <= 0) {
         System.err.printf("%d is an invalid dimensional value. Changing to 1.",cellDim[i]);
@@ -108,83 +200,4 @@ public class PalettePrinter {
   }
 
 
-  public static void main(String[] args) {
- 
-    boolean createPng = true;
-    boolean defaultOutput = true;
-    int[] cellDimensions;
-    
-    String inputFileName;
-
-    BitPalette bitPal = new BitPalette();
-    PalettePrinter palPrinter = new PalettePrinter();
-    int[] colors;
-
-    //remove later
-    cellDimensions = new int[]{50,50};
-
-    switch (args.length) {
-      // test code runs here
-      //case 0:   break;
-
-      // Resulting grid has input.gpl-specified number of columns
-      case 1:   inputFileName = args[0];
-                break;
-
-      // HSB/CIELCH ordering
-      case 2:   if (!args[1].equals("HSB") || !args[1].equals( "CIELCH")) {
-                  badArgsMessage();
-                  return;
-                }
-                inputFileName = args[0];
-                palPrinter = new PalettePrinter(cellDimensions);
-                // call paletteOrder()
-                break;
-
-      // default bit palette print
-      case 3:   colors = new int[]{
-                  Integer.parseInt(args[0]), 
-                  Integer.parseInt(args[1]), 
-                  Integer.parseInt(args[2])
-                };
-                bitPal = new BitPalette(colors);
-                palPrinter = new PalettePrinter(cellDimensions,bitPal);
-                break;
-
-      // specified bit palette creation/print
-      case 5:   colors = new int[] {
-                  Integer.parseInt(args[0]), 
-                  Integer.parseInt(args[1]), 
-                  Integer.parseInt(args[2])
-                };
-                System.out.printf("%s %s %s %s %s\n",args[0],args[1],args[2],args[3],args[4]);
-                bitPal = new BitPalette(colors);
-                palPrinter = new PalettePrinter(cellDimensions,bitPal);
-                if (args[3].equals("-gpl")) {
-                  createPng = false;
-                  defaultOutput = false;
-                } else if (args[3].equals("-png")) {
-                  defaultOutput = false; 
-                } else {
-                  badArgsMessage();
-                  return;
-                }
-                break;
-
-      default:  badArgsMessage();
-                return;
-    }
-
-    if (createPng) {
-      palPrinter.drawGrid(bitPal);
-      if (defaultOutput) {
-        palPrinter.writePng();
-      } else {
-        palPrinter.writePng(args[4]);
-      }
-    } else {
-    }
-
-    return;
-  }
 }

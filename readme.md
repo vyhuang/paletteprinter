@@ -10,7 +10,7 @@ Can take input in the two following forms:
   - if "HSB", a color's row is determined by its hue, and its column by its brightness
   - if "CIELCH", a color's row is determined by its hue, and it's column by its lightness. 
 
-`java -jar paletteprinter [R] [G] [B] ?[-gpl/-png] ?[input.gpl/output.png]`  
+`java -jar paletteprinter [R] [G] [B] ?([-gpl/-png] [input.gpl/output.png])`  
 * R,G,B are the number of bits available for the red, green, and blue channels respectively.
 * The second parameter is optional. If this is absent, create the file "output.png" containing
  an image grid where R increases alongside the y-axis, G increases alongside the x-axis, and B
@@ -34,8 +34,8 @@ Can take input in the two following forms:
 - *Custom Palette Display*
   1. Read in a .gpl input file and create an image grid of its values, where the number of columns is equal to that specified in the input file itsef.
   2. Order this image grid according to the following specifications, allowing for blank spaces:
-      * Y-axis position is determined by H from the HSV color scheme
-      * X-axis position is determined by V from the HSV color scheme
+      * Y-axis position is determined by H from the HSB color scheme
+      * X-axis position is determined by V from the HSB color scheme
   3. Order this image grid according to the following specifications, allowing for blank spaces:
       * Y-axis position is determined by H from the CIELCH color scheme
       * X-axis position is determined by L from the CIELCH color scheme
