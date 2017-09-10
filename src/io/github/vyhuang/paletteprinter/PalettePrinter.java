@@ -32,8 +32,6 @@ public class PalettePrinter {
   int imageWidth, imageHeight;
   int cellWidth, cellHeight;
 
-  Color[][] orderedPalette;
-
   public static void main(String[] args) {
 
     // Indicates that output filename will be default.png
@@ -48,7 +46,7 @@ public class PalettePrinter {
     final int MODE_RGB_GPL_DEFAULT  = 6;
     final int MODE_RGB_GPL_CUSTOM   = 7;
 
-    BitPalette bitPal = new BitPalette();
+    Palette palette = new Palette();
     PalettePrinter palPrinter = new PalettePrinter();
     String inputFileName;
 
@@ -88,7 +86,7 @@ public class PalettePrinter {
 
       // default bit palette print
       case 3:   mode = MODE_RGB_PNG_DEFAULT;
-                bitPal = new BitPalette(colors);
+                palette = new BitPalette(colors);
                 break;
 
       // specified bit palette creation/print
@@ -102,20 +100,22 @@ public class PalettePrinter {
                 }
  
                 System.out.printf("%s %s %s %s %s\n",args[0],args[1],args[2],args[3],args[4]);
-                bitPal = new BitPalette(colors);
+                palette = new BitPalette(colors);
                break;
 
       default:  badArgsMessage();
                 return;
     }
 
+    palette.initializePalette();
+
     switch (mode) {
       case MODE_RGB_PNG_DEFAULT:
-                palPrinter.drawGrid(bitPal);
+                palPrinter.drawGrid(palette);
                 palPrinter.writePng();
                 break;
       case MODE_RGB_PNG_CUSTOM:
-                palPrinter.drawGrid(bitPal);
+                palPrinter.drawGrid(palette);
                 palPrinter.writePng(args[4]);
                 break;
       case MODE_GPL_HSB_DEFAULT:
@@ -150,18 +150,27 @@ public class PalettePrinter {
     cellHeight  = cellDim[1];
   }
 
-  private void drawGrid(BitPalette bitPalette) {
-    imageWidth = cellWidth * bitPalette.paletteCols();
-    imageHeight = cellHeight * bitPalette.paletteRows();
+  private void drawGrid(Palette palette) {
+
+    if (palette.paletteColumns() > 76) {
+      cellWidth = 3840 / palette.paletteColumns();
+      cellWidth = (cellWidth > 0) ? cellWidth : 1;
+    }
+    if (palette.paletteRows() > 43) {
+      cellHeight = 2160 / palette.paletteRows();
+    }
+
+    imageWidth = cellWidth * palette.paletteColumns();
+    imageHeight = cellHeight * palette.paletteRows();
 
     image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
 
     Graphics2D g2d = image.createGraphics();
     Rectangle.Float cell = new Rectangle.Float(0,0,cellWidth,cellHeight);
     Color currentColor;
-    for (int i = 0; i < bitPalette.paletteRows(); i += 1) {
-      for (int j = 0; j < bitPalette.paletteCols(); j += 1) {
-        currentColor = bitPalette.getColor(i,j);
+    for (int i = 0; i < palette.paletteRows(); i += 1) {
+      for (int j = 0; j < palette.paletteColumns(); j += 1) {
+        currentColor = palette.getColor(i,j);
         g2d.setColor(currentColor);
         cell.setRect(j*cell.getWidth(), i*cell.getHeight(), cell.getWidth(), cell.getHeight());
         //System.out.printf("x,y = %d,%d\n",(int)cell.getX(),(int)cell.getY());
@@ -169,9 +178,10 @@ public class PalettePrinter {
       }
     }
   }
-  private void drawGrid() {
-  }
 
+  public void writePng() {
+    writePng("default.png");
+  }
   public void writePng(String outputFilename) {
     File outputFile;
     try {
@@ -182,16 +192,7 @@ public class PalettePrinter {
       System.out.println("Image failed to be saved.");
     }
   }
-  public void writePng() {
-    try {
-      File outputFile = new File("default.png");
-      ImageIO.write(image, "png", outputFile);
-      System.out.println("Saved to default.png");
-    } catch (IOException e) {
-      System.out.println("Image failed to be saved.");
-    }
-  }
- 
+
   private static void badArgsMessage() {
       System.out.println(
           "java -jar paletteprinter.jar [input.gpl] ?[HSB/CIELCH] \n \t OR \n" +

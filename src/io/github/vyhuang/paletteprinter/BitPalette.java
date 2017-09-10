@@ -15,17 +15,11 @@ import java.awt.Color;
  * </ul>
  * </p>
  */
-public class BitPalette {
-  private char redBits, blueBits, greenBits;
-  private int redLevels, greenLevels, blueLevels;
-  private Color[][] internalPalette;
-  private int paletteRows, paletteCols;
+public class BitPalette extends Palette {
+  //protected int[][] internalPalette
+  private byte[]    rgbBits;
 
-  /**
-   * Empty constructor; should only be called within this package.
-   */
-  protected BitPalette() {}
-  /**
+ /**
    * Parameterized constructor, initializes this instance to hold the RGB palette corresponding to
    * the input array rgbBits.
    *
@@ -33,23 +27,16 @@ public class BitPalette {
    */
   BitPalette(int[] rgbBits) {
 
-    bitCheck(rgbBits);
+    this.rgbBits = new byte[3];
 
-    redBits     = (char) rgbBits[0];
-    greenBits   = (char) rgbBits[1];
-    blueBits    = (char) rgbBits[2];
+    this.rgbBits[0]     = (byte) rgbBits[0];
+    this.rgbBits[1]     = (byte) rgbBits[1];
+    this.rgbBits[2]     = (byte) rgbBits[2];
 
-    redLevels   = (int) Math.pow(2,redBits);
-    greenLevels = (int) Math.pow(2,greenBits);
-    blueLevels  = (int) Math.pow(2,blueBits);
-
-    /** There are |redLevels|*|blueLevels| columns, and |greenLevels| rows */
-    paletteRows = greenLevels;
-    paletteCols = redLevels * blueLevels;
-
-    paletteInit();
+    bitCheck();
   }
-  private void bitCheck(int[] rgbBits) {
+
+  private void bitCheck() {
     String channelColor;
     for (int i = 0; i < rgbBits.length; i += 1) {
       switch (i) {
@@ -73,30 +60,32 @@ public class BitPalette {
       }
     }
   }
-  private void paletteInit() {
-    internalPalette = new Color[paletteRows][paletteCols];
+
+  @Override
+  public void initializePalette() {
+    internalPalette = new int[greenLevels()][redLevels() * blueLevels()];
 
     double redIncrement, greenIncrement, blueIncrement;
-    redIncrement = incrementCalc(redBits);
-    greenIncrement = incrementCalc(greenBits);
-    blueIncrement = incrementCalc(blueBits);
+    redIncrement = incrementCalc(redBits());
+    greenIncrement = incrementCalc(greenBits());
+    blueIncrement = incrementCalc(blueBits());
 
     double red, green, blue;
-    red = green = blue = 0;
     int intRed, intGreen, intBlue;
+    red = green = blue = 0;
     intRed = intGreen = intBlue = 0;
     
     // each row depends on green values, so start there.
-    for (int i = 0; i < greenLevels; i += 1) {
+    for (int i = 0; i < greenLevels(); i += 1) {
       blue = 0;
-      for (int j = 0; j < blueLevels; j += 1) {
+      for (int j = 0; j < blueLevels(); j += 1) {
         red = 0;
-        for (int k = 0; k < redLevels; k += 1) {
+        for (int k = 0; k < redLevels(); k += 1) {
           //System.out.println((int)red + "\t" + (int)green + "\t" + (int)blue);
           intRed = (int) Math.round(red);
           intGreen = (int) Math.round(green);
           intBlue = (int) Math.round(blue);
-          internalPalette[i][(j*redLevels) + k] = new Color(intRed, intGreen, intBlue);
+          internalPalette[i][(j*redLevels()) + k] = (intRed << 16) + (intGreen << 8) + intBlue;
           red += redIncrement;
         }
         blue += blueIncrement;
@@ -104,7 +93,7 @@ public class BitPalette {
       green += greenIncrement;
     }
   }
-  private double incrementCalc(char bits) {
+  private double incrementCalc(int bits) {
     double numLevels = Math.pow(2,bits);
     return 255/(numLevels-1);
   }
@@ -113,61 +102,37 @@ public class BitPalette {
    * Returns number of bits allocated for the red color channel.
    */
   public int redBits() {
-    return redBits;
+    return rgbBits[0];
   }
   /**
    * Returns number of bits allocated for the green color channel.
    */
   public int greenBits() {
-    return greenBits;
+    return rgbBits[1];
   }
   /**
    * Returns number of bits allocated for the blue color channel.
    */
   public int blueBits() {
-    return blueBits;
+    return rgbBits[2];
   }
   /**
    * Returns number of unique levels possible for the red color channel.
    */
   public int redLevels() {
-    return redLevels;
+    return (int) Math.pow(2,redBits());
   }
   /**
    * Returns number of unique levels possible for the green color channel.
    */
   public int greenLevels() {
-    return greenLevels;
+    return (int) Math.pow(2,greenBits());
   }
   /**
    * Returns number of unique levels possible for the blue color channel.
    */
   public int blueLevels() {
-    return blueLevels;
+    return (int) Math.pow(2,blueBits());
   }
-  /**
-   * Returns number of columns in palette (length of a row).
-   */
-  public int paletteCols() {
-    return paletteCols;
-  }
-  /**
-   * Returns number of rows in a palette (height of a column).
-   */
-  public int paletteRows() {
-    return paletteRows;
-  }
-  /**
-   * Retrieves the java.awt.Color object at the specified location in the palette.
-   *
-   * @param row     the row the desired Color is in
-   * @param column  the column the desired Color is in
-   */
-  public Color getColor(int row, int column) {
-    if (row >= paletteRows || column >= paletteCols) {
-      System.err.println("getColor() request out of bounds.");
-      return null;
-    }
-    return internalPalette[row][column];
-  }
+
 }

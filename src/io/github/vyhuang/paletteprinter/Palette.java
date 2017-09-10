@@ -2,10 +2,16 @@ package io.github.vyhuang.paletteprinter;
 
 import java.awt.Color;
 
-public abstract class Palette {
+public class Palette {
   protected int[][] internalPalette;
 
-  public abstract void initializePalette();
+  public void initializePalette() {
+    if (this instanceof Palette) {
+      System.err.println("Invalid operation; initializePalette() can only be called for " + 
+          "BitPalette or OrderedPalette classes");
+    }
+    return;
+  }
 
   public int paletteColumns() {
     if (internalPalette == null) {
