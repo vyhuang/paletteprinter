@@ -32,21 +32,25 @@ public class PalettePrinter {
   int imageWidth, imageHeight;
   int cellWidth, cellHeight;
 
-  public static void main(String[] args) {
-
+  protected enum PrinterMode {
     // Indicates that output filename will be default.png
-    final int MODE_RGB_PNG_DEFAULT  = 0;
-    final int MODE_GPL_HSB_DEFAULT  = 1;
-    final int MODE_GPL_CIE_DEFAULT  = 2;
+    RGB_PNG_DEFAULT,
+    GPL_HSB_DEFAULT,
+    GPL_CIE_DEFAULT,
     // Indicates that custom filenames have been provided
-    final int MODE_RGB_PNG_CUSTOM   = 3;
-    final int MODE_GPL_HSB_CUSTOM   = 4;
-    final int MODE_GPL_CIE_CUSTOM   = 5;
+    RGB_PNG_CUSTOM,
+    GPL_HSB_CUSTOM,
+    GPL_CIE_CUSTOM,
     // Indicates that .gpl file will be created instead of a .png file
-    final int MODE_RGB_GPL_DEFAULT  = 6;
-    final int MODE_RGB_GPL_CUSTOM   = 7;
+    RGB_GPL_DEFAULT,
+    RGB_GPL_CUSTOM,
+    // Initialized value. 
+    NONE
 
-    Palette palette = new Palette();
+  }
+
+  public static void main(String[] args) {
+    Palette palette = null;
     PalettePrinter palPrinter = new PalettePrinter();
     String inputFileName;
 
@@ -61,7 +65,7 @@ public class PalettePrinter {
       };
     }
 
-    int mode = -1;
+    PrinterMode mode = PrinterMode.NONE;
 
     switch (args.length) {
       //test code in main runs here
@@ -73,64 +77,64 @@ public class PalettePrinter {
 
       // HSB/CIELCH ordering
       case 2:   if (args[1].equals("HSB")) {
-                  mode = MODE_GPL_HSB_DEFAULT;
+                  mode = PrinterMode.GPL_HSB_DEFAULT;
                 } else if (args[1].equals( "CIELCH")) {
-                  mode = MODE_GPL_CIE_DEFAULT;
+                  mode = PrinterMode.GPL_CIE_DEFAULT;
                 } else {
-                  badArgsMessage();
-                  return;
+                    break;
                 }
                 inputFileName = args[0];
                 // call paletteOrder()
                 break;
 
       // default bit palette print
-      case 3:   mode = MODE_RGB_PNG_DEFAULT;
+      case 3:   mode = PrinterMode.RGB_PNG_DEFAULT;
                 palette = new BitPalette(colors);
                 break;
 
       // specified bit palette creation/print
       case 5:   if (args[3].equals("-gpl")) {
-                  mode = MODE_RGB_GPL_CUSTOM;
+                  mode = PrinterMode.RGB_GPL_CUSTOM;
                 } else if (args[3].equals("-png")) {
-                  mode = MODE_RGB_PNG_CUSTOM;
+                  mode = PrinterMode.RGB_PNG_CUSTOM;
                 } else {
-                  badArgsMessage();
-                  return;
+                    break;
                 }
- 
                 System.out.printf("%s %s %s %s %s\n",args[0],args[1],args[2],args[3],args[4]);
                 palette = new BitPalette(colors);
                break;
-
-      default:  badArgsMessage();
-                return;
     }
 
-    palette.initializePalette();
+    if (palette == null) {
+      mode = PrinterMode.NONE;
+    }
+    else {
+      palette.initializePalette();
+    }
 
     switch (mode) {
-      case MODE_RGB_PNG_DEFAULT:
+      case RGB_PNG_DEFAULT:
                 palPrinter.drawGrid(palette);
                 palPrinter.writePng();
                 break;
-      case MODE_RGB_PNG_CUSTOM:
+      case RGB_PNG_CUSTOM:
                 palPrinter.drawGrid(palette);
                 palPrinter.writePng(args[4]);
                 break;
-      case MODE_GPL_HSB_DEFAULT:
+      case GPL_HSB_DEFAULT:
                 break;
-      case MODE_GPL_HSB_CUSTOM:
+      case GPL_HSB_CUSTOM:
                 break;
-      case MODE_GPL_CIE_DEFAULT:
+      case GPL_CIE_DEFAULT:
                 break;
-      case MODE_GPL_CIE_CUSTOM:
+      case GPL_CIE_CUSTOM:
                 break;
-      case MODE_RGB_GPL_DEFAULT:
+      case RGB_GPL_DEFAULT:
                 break;
-      case MODE_RGB_GPL_CUSTOM:
+      case RGB_GPL_CUSTOM:
                 break;
       default:  
+                badArgsMessage();
                 return;
     }
     return;
@@ -196,7 +200,7 @@ public class PalettePrinter {
   private static void badArgsMessage() {
       System.out.println(
           "java -jar paletteprinter.jar [input.gpl] ?[HSB/CIELCH] \n \t OR \n" +
-          "java -jar paletteprinter.jar [R] [G] [B] ?([-gpl/-png] [output.gpl/output.png])"
+          "java -jar paletteprinter.jar [R] [G] [B] (=png/-gpl) [=output.<filetype>])"
           );
   }
 

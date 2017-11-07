@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-  <project name="Palette_Printer" default="main">
+  <project name="PalettePrinter" default="main">
   
   <property file="build.properties"/>
 
